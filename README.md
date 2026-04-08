@@ -76,7 +76,7 @@ src/main/java/com/example/todo/
 
 ```bash
 git clone https://github.com/mjulianegreiros/todo-api.git
-cd todo-api && cd toddo
+cd todo-api && cd todo
 ```
 
 ### 2. Subir o banco com Docker
