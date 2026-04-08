@@ -1,0 +1,72 @@
+📦 Módulo 1 — Fundação do Projeto
+
+Objetivo: ter o projeto rodando, com estrutura básica e banco de dados conectado via Docker.
+
+
+Task 1.1 — Criar o projeto no start.spring.io com as dependências certas (Spring Web, Spring Data JPA, PostgreSQL Driver, Validation)
+Task 1.2 — Subir um banco PostgreSQL com Docker Compose
+Task 1.3 — Configurar o application.properties para conectar no banco
+Task 1.4 — Criar a primeira entidade (User) e verificar se o Hibernate cria a tabela automaticamente
+
+
+🧱 Módulo 2 — CRUD de Usuários (sem autenticação ainda)
+
+Objetivo: entender o fluxo Controller → Service → Repository antes de complicar com segurança.
+
+
+Task 2.1 — Criar o UserRepository (Spring Data JPA)
+Task 2.2 — Criar o UserService com lógica de registro (incluindo hash de senha com BCrypt)
+Task 2.3 — Criar o UserController com o endpoint POST /register
+Task 2.4 — Criar DTOs de request/response e usar @Valid para validação
+Task 2.5 — Tratar erros com @ControllerAdvice (ex: e-mail duplicado → 409)
+
+
+✅ Módulo 3 — CRUD de Todos (ainda sem auth)
+
+Objetivo: implementar toda a lógica de negócio dos todos antes de protegê-los.
+
+
+Task 3.1 — Criar a entidade Todo com relação @ManyToOne para User
+Task 3.2 — Criar TodoRepository, TodoService, TodoController
+Task 3.3 — Implementar POST /todos, PUT /todos/{id}, DELETE /todos/{id}
+Task 3.4 — Implementar GET /todos com paginação (Pageable)
+Task 3.5 — Validar que o usuário só pode editar/deletar os próprios todos
+
+
+🔐 Módulo 4 — Autenticação com JWT
+
+Objetivo: proteger a API com tokens JWT.
+
+
+Task 4.1 — Adicionar dependência do Spring Security + biblioteca JWT
+Task 4.2 — Criar o endpoint POST /login que valida credenciais e retorna um token
+Task 4.3 — Criar um filtro (OncePerRequestFilter) que lê o token do header e autentica o usuário
+Task 4.4 — Configurar o SecurityFilterChain — rotas públicas (/register, /login) vs protegidas
+Task 4.5 — Recuperar o usuário autenticado dentro dos endpoints usando SecurityContextHolder
+
+
+🛡️ Módulo 5 — Autorização e Segurança
+
+Objetivo: garantir que usuário A não mexa nos todos do usuário B.
+
+
+Task 5.1 — Validar ownership nos endpoints de update/delete (retornar 403 se não for o dono)
+Task 5.2 — Garantir que o GET /todos retorna somente os todos do usuário autenticado
+Task 5.3 — Revisar todos os status HTTP retornados (401 vs 403 vs 404 vs 409)
+
+
+🧪 Módulo 6 — Testes
+
+Objetivo: escrever testes que garantam que tudo funciona como esperado.
+
+
+Task 6.1 — Testes unitários para o TodoService com Mockito
+Task 6.2 — Testes de integração com @SpringBootTest para os endpoints principais
+
+
+🎁 Módulo 7 — Bônus (quando tudo estiver sólido)
+
+Filtros e ordenação nos todos (?status=done&sort=createdAt)
+Rate limiting
+Refresh token
+Frontend (se quiser)
