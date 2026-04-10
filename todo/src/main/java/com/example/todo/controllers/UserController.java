@@ -1,5 +1,8 @@
 package com.example.todo.controllers;
 
+import java.net.URI;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,11 +27,13 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public UserResponseDTO register(@RequestBody @Valid UserRequestDTO user){
+    public ResponseEntity<UserResponseDTO> register(@RequestBody @Valid UserRequestDTO user){
         User toSave = new User(user.getName() , user.getEmail() , user.getPassword());
         User saved = userService.register(toSave);
         UserResponseDTO userResponseDTO = new UserResponseDTO(saved.getId(), saved.getName(), saved.getEmail());
-        return userResponseDTO;
+
+        URI uri = URI.create("api/register/" + saved.getId());
+        return ResponseEntity.created(uri).body(userResponseDTO);
     }
 
     @PostMapping("/login")

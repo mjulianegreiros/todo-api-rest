@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.example.todo.exceptions.ForbiddenException;
+import com.example.todo.exceptions.ResourceNotFoundException;
 import com.example.todo.models.Todo;
 import com.example.todo.models.User;
 import com.example.todo.repositories.TodoRepository;
@@ -24,23 +26,31 @@ public class TodoService {
         return todoRepository.save(todo);
     }
 
-    public Page<Todo> getAllTodos(Pageable page){
-        return todoRepository.findAll(page);
+    public Page<Todo> getAllTodos(User user , Pageable page){
+        return todoRepository.findByUser(user, page);
     }
 
     public Optional<Todo> findById(Long id){
         return todoRepository.findById(id);
     }
 
-    public Todo updateTodo(Long id , String title , String description){
+    public Todo updateTodo(Long id , String title , String description , Long userId){
         Optional<Todo> toChange = todoRepository.findById(id);
-        toChange.orElseThrow(() -> new RuntimeException("Todo não encontrado."));
+        toChange.orElseThrow(() -> new ResourceNotFoundException("Todo não encontrado."));
+        if(!(toChange.get().getUser().getId().equals(userId))){
+            throw new ForbiddenException("Usuário não autorizado.");
+        }
         toChange.get().setTitle(title);
         toChange.get().setDescription(description);
         return todoRepository.save(toChange.get());
     }
 
-    public void deleteTodo(Long id){
+    public void deleteTodo(Long id , Long userId){
+        Optional<Todo> toDelete = todoRepository.findById(id);
+        toDelete.orElseThrow(() -> new ResourceNotFoundException("Todo não encontrado."));
+        if(!(toDelete.get().getUser().getId().equals(userId))){
+            throw new ForbiddenException("Usuário não autorizado.");
+        }
         todoRepository.deleteById(id);
     }
 }

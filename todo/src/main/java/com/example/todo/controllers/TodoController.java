@@ -1,5 +1,6 @@
 package com.example.todo.controllers;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,29 +36,34 @@ public class TodoController {
 
     @GetMapping("/todos")
     public Page<TodoResponseDTO> getAllTodos(Pageable page){
-        Page<Todo> allTodos = todoService.getAllTodos(page);
+        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Page<Todo> allTodos = todoService.getAllTodos(user , page);
         // O map() itera sobre cada elemento — o newTodo representa um todo de cada vez.
-        return allTodos.map(newTodo -> new TodoResponseDTO(newTodo.getId(), newTodo.getTitle(), newTodo.getDescription(), null));
+        return allTodos.map(newTodo -> new TodoResponseDTO(newTodo.getId(), newTodo.getTitle(), newTodo.getDescription(), user.getId()));
     }
     
     @PostMapping("/todos")
-    public TodoResponseDTO createTodo(@Valid @RequestBody TodoRequestDTO todoRequestDTO ){
+    public ResponseEntity<TodoResponseDTO> createTodo(@Valid @RequestBody TodoRequestDTO todoRequestDTO ){
         User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Todo toSave = new Todo(todoRequestDTO.getTitle() , todoRequestDTO.getDescription() , user);
         Todo saved = todoService.createTodo(toSave);
 
-        return new TodoResponseDTO(saved.getId() , saved.getTitle() , saved.getDescription() , user.getId());
+        URI uri = URI.create("api/todos/" + saved.getId());
+
+        return ResponseEntity.created(uri).body(new TodoResponseDTO(saved.getId() , saved.getTitle() , saved.getDescription() , saved.getUser().getId()));
     }
 
     @PutMapping("/todos/{id}")
     public TodoResponseDTO updateTodo(@PathVariable Long id , @Valid @RequestBody TodoRequestDTO todoRequestDTO){
-        Todo toChange = todoService.updateTodo(id, todoRequestDTO.getTitle(), todoRequestDTO.getDescription());
-        return new TodoResponseDTO(toChange.getId() , toChange.getTitle() , toChange.getDescription() , null);
+        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Todo toChange = todoService.updateTodo(id, todoRequestDTO.getTitle(), todoRequestDTO.getDescription() , user.getId());
+        return new TodoResponseDTO(toChange.getId() , toChange.getTitle() , toChange.getDescription() , toChange.getUser().getId());
     }
 
     @DeleteMapping("/todos/{id}")
     public ResponseEntity<Void> deleteTodo(@PathVariable Long id){
-        todoService.deleteTodo(id);
+        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        todoService.deleteTodo(id , user.getId());
         return ResponseEntity.noContent().build();
     }
 }
